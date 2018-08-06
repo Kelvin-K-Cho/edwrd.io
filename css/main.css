@@ -1,0 +1,11 @@
+:root {
+  --primary-color: 	#FFFFFF;
+  --secondary-color: #EDEDED;
+  --tertiary-color: #546a76;
+  --quaternary-color: #C6DBF0;
+  --quinary-color: #FF5465;
+}
+
+body {
+  background-color: var(--secondary-color);
+}

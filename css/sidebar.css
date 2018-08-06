@@ -1,0 +1,23 @@
+#sidebar {
+  position: fixed;
+  width: 6vw;
+  display: flex;
+  flex-direction: column;
+  height: 93vh;
+  background-color: var(--tertiary-color);
+}
+
+#sidebar > li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    padding: 4vh;
+    color: var(--primary-color);
+}
+
+.nav-text {
+  margin-top: 10px;
+  font-size: 12px;
+}

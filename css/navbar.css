@@ -1,0 +1,25 @@
+#navbar {
+  background-color: var(--primary-color);
+  height: 7vh;
+}
+
+#app-logo {
+  height: 28px;
+  width: 100px;
+  margin: 0 0 3px 0;
+}
+
+#zip-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.nav-item > i {
+  font-size: 25px;
+}
+
+#zip-form {
+  width: 5vw;
+}
