@@ -71,8 +71,7 @@ $(function(){
   let fetchTemplates = () => {
     let url = `http://34.216.224.153:9000/fabric/fetchAllTemplates`;
     $.get(url, function(result){
-      console.log(result);
-      console.log(JSON.parse(result));
+      console.log(JSON.parse(result)[0]);
     });
   };
 
