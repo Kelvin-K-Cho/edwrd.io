@@ -54,7 +54,7 @@ $(function(){
     canvas.renderAll.bind(canvas));
   };
 
-  let saveTemplate = () => {
+  let downloadTemplate = () => {
     let json = JSON.stringify(canvas.toJSON());
 
     let download = (content, fileName, contentType) => {
@@ -66,6 +66,14 @@ $(function(){
     };
 
     download(json, 'json.txt', "text/plain;charset=utf-8");
+  };
+
+  let fetchTemplates = () => {
+    let url = `http://34.216.224.153:9000/fabric/fetchAllTemplates`;
+    $.get(url, function(result){
+      console.log(result);
+      console.log(JSON.parse(result));
+    });
   };
 
   let uploadTemplate = (e) => {
@@ -91,7 +99,8 @@ $(function(){
   $("#addText").click(addText);
   $("#addRectangle").click(addRectangle);
   $("#deleteImage").click(deleteImage);
-  $("#saveTemplate").click(saveTemplate);
+  $("#downloadTemplate").click(downloadTemplate);
+  $("#fetchTemplates").click(fetchTemplates);
   $("#changeBackground").click(changeBackground);
 
   $("#addPhoto").change(addPhoto);
