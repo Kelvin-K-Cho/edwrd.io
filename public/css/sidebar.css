@@ -8,16 +8,35 @@
 }
 
 #sidebar > li {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    padding: 4vh;
-    color: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  padding: 4vh;
+  color: var(--primary-color);
 }
 
 .nav-text {
   margin-top: 10px;
   font-size: 12px;
+}
+
+.nav-link > i {
+  font-size: 25px;
+}
+
+.nav-link > * {
+  display: block;
+  text-align: center;
+}
+
+li > .nav-link {
+  border-radius: 3px;
+  color: var(--primary-color);
+  width: auto;
+}
+
+#text-button, #context-button {
+  width: 4vw;
 }

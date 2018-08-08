@@ -50,7 +50,7 @@ $(function(){
   };
 
   let changeBackground = () => {
-    canvas.setBackgroundColor("#42bcf4",
+    canvas.setBackgroundColor("#42bcf4", //this is correct
     canvas.renderAll.bind(canvas));
   };
 
@@ -69,10 +69,70 @@ $(function(){
   };
 
   let fetchTemplates = () => {
+    let html = ``;
     let url = `http://34.216.224.153:9000/fabric/fetchAllTemplates`;
-    $.get(url, function(result){
-      console.log(JSON.parse(result)[0]);
+
+    //Function to scale the canvas to a certain dimension.
+    let scale = (image, factor) => {
+      image.setHeight(image.getHeight() * factor);
+      image.setWidth(image.getWidth() * factor);
+      if (image.backgroundImage) {
+          // Need to scale background images as well
+          let backgroundImage = image.backgroundImage;
+          backgroundImage.width = backgroundImage.width * factor;
+          backgroundImage.height = backgroundImage.height * factor;
+      }
+      image.setZoom(factor);
+      image.renderAll();
+      image.calcOffset();
+    };
+
+    $.get(url, function(output){
+      $(`#layouts-list`).empty();
+      let parsedList = JSON.parse(output);
+
+      Object.values(parsedList).forEach((element) => {
+        let object = JSON.parse(element);
+        let _id = object[`_id`];
+
+        html += `
+          <li class="layouts-item">
+            <canvas class="layout-image" id="template-${_id}" height="480" width="320"></canvas>
+          </li>
+        `;
+        $(`#layouts-list`).append(html);
+
+        let image = new fabric.StaticCanvas(`template-${_id}`);
+        image.loadFromJSON(object);
+        scale(image, .3);
+        html = ``;
+
+      });
     });
+  };
+
+  let setTemplate = (event) => {
+    event.preventDefault();
+
+    let templateId = event.currentTarget.id;
+
+    //Create a new instance of fabric using the existing canvas.
+    let temp = new fabric.Canvas(`#${templateId}`);
+
+    //Store it in a method (named "template") under the exact same canvas element.
+    document.getElementById(`${templateId}`).template = temp;
+
+
+
+    // let template = document.getElementById(`${templateId}`);
+    //
+    // console.log(template);
+
+    // let json = JSON.stringify(template.toJSON());
+    //
+    // console.log(json);
+
+    return false;
   };
 
   let uploadTemplate = (e) => {
@@ -99,8 +159,9 @@ $(function(){
   $("#addRectangle").click(addRectangle);
   $("#deleteImage").click(deleteImage);
   $("#downloadTemplate").click(downloadTemplate);
-  $("#fetchTemplates").click(fetchTemplates);
+  $("#layouts-button").click(fetchTemplates);
   $("#changeBackground").click(changeBackground);
+  $("#layouts-list").on("click", ".layout-image", setTemplate);
 
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);
