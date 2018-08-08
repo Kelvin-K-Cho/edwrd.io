@@ -36,7 +36,3 @@ li > .nav-link {
   color: var(--primary-color);
   width: auto;
 }
-
-#text-button, #context-button {
-  width: 4vw;
-}

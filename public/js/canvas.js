@@ -1,5 +1,6 @@
 $(function(){
   let canvas = new fabric.Canvas("canvas");
+  let selectedShape;
 
   // Functions
   let initializeCanvas = () => {
@@ -17,6 +18,46 @@ $(function(){
       opacity: .25,
     });
     canvas.add(rectangle);
+  };
+
+  let addShape = () => {
+    let shape = selectedShape;
+    let color = $(`#shape-color`).val();
+    let opacity = parseInt($(`#shape-opacity`).val());
+    switch (shape) {
+      case "circle":
+        let circle = new fabric.Circle({
+          left: 50,
+          top: 50,
+          radius: 20,
+          fill: color,
+          opacity: opacity
+        });
+        canvas.add(circle);
+        break;
+      case "square":
+        let square = new fabric.Rect({
+          left: 50,
+          top: 50,
+          width: 25,
+          height: 25,
+          fill: color,
+          opacity
+        });
+        canvas.add(square);
+        break;
+      case "line":
+        let line = new fabric.Line([50, 100, 200, 200], {
+          left: 50,
+          top: 50,
+          stroke: color,
+          opacity
+        });
+        canvas.add(line);
+        break;
+      default:
+      return false;
+    }
   };
 
   let addText = () => {
@@ -72,15 +113,13 @@ $(function(){
     let html = ``;
     let url = `http://34.216.224.153:9000/fabric/fetchAllTemplates`;
 
-    //Function to scale the canvas to a certain dimension.
     let scale = (image, factor) => {
       image.setHeight(image.getHeight() * factor);
       image.setWidth(image.getWidth() * factor);
       if (image.backgroundImage) {
-          // Need to scale background images as well
-          let backgroundImage = image.backgroundImage;
-          backgroundImage.width = backgroundImage.width * factor;
-          backgroundImage.height = backgroundImage.height * factor;
+        let backgroundImage = image.backgroundImage;
+        backgroundImage.width = backgroundImage.width * factor;
+        backgroundImage.height = backgroundImage.height * factor;
       }
       image.setZoom(factor);
       image.renderAll();
@@ -128,7 +167,7 @@ $(function(){
     canvas.loadFromJSON(template, function() {
       canvas.renderAll();
     });
-    
+
     return false;
   };
 
@@ -149,19 +188,34 @@ $(function(){
     reader.readAsText(file);
   };
 
+  let changeColor = () => {
+    let color = $(`#shape-color`).val();
+    $(`#selected-color`).css(`background-color`, `${color}`);
+  };
+
   // Events
   initializeCanvas();
+  fetchTemplates(); //load all templates from the start since it's big call
+
+  $(`#shapes-list`).selectable({
+    selected: function(){
+      $(`.ui-selected`, this).each(function(){
+        selectedShape = $(this).get(0).id;
+      });
+    }
+  });
 
   $("#addText").click(addText);
   $("#addRectangle").click(addRectangle);
+  $("#addShape").click(addShape);
   $("#deleteImage").click(deleteImage);
   $("#downloadTemplate").click(downloadTemplate);
-  $("#layouts-button").click(fetchTemplates);
   $("#changeBackground").click(changeBackground);
   $("#layouts-list").on("click", ".layout-image", setTemplate);
 
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);
+  $(`#shape-color`).change(changeColor);
 
   $("#addButton").click(function(){
     $("#addPhoto").click();
