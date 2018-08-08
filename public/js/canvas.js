@@ -87,6 +87,8 @@ $(function(){
       image.calcOffset();
     };
 
+    let templates = window._templates = {};
+
     $.get(url, function(output){
       $(`#layouts-list`).empty();
       let parsedList = JSON.parse(output);
@@ -94,6 +96,8 @@ $(function(){
       Object.values(parsedList).forEach((element) => {
         let object = JSON.parse(element);
         let _id = object[`_id`];
+
+        templates[`template-${_id}`] = object;
 
         html += `
           <li class="layouts-item">
@@ -104,6 +108,7 @@ $(function(){
 
         let image = new fabric.StaticCanvas(`template-${_id}`);
         image.loadFromJSON(object);
+
         scale(image, .3);
         html = ``;
 
@@ -116,22 +121,14 @@ $(function(){
 
     let templateId = event.currentTarget.id;
 
-    //Create a new instance of fabric using the existing canvas.
-    let temp = new fabric.Canvas(`#${templateId}`);
+    let template = window._templates[templateId];
 
-    //Store it in a method (named "template") under the exact same canvas element.
-    document.getElementById(`${templateId}`).template = temp;
+    canvas.clear();
 
-
-
-    // let template = document.getElementById(`${templateId}`);
-    //
-    // console.log(template);
-
-    // let json = JSON.stringify(template.toJSON());
-    //
-    // console.log(json);
-
+    canvas.loadFromJSON(template, function() {
+      canvas.renderAll();
+    });
+    
     return false;
   };
 
