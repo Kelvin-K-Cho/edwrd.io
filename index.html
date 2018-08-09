@@ -157,8 +157,69 @@
             <button type="button" class="btn btn-outline-primary btn-sm" id="addShape">Add Shape</button>
           </div>
         </div>
-        <div class="tab-pane fade" id="text" role="tabpanel" aria-labelledby="text-button">text</div>
-        <div class="tab-pane fade" id="background" role="tabpanel" aria-labelledby="background-button">background</div>
+        <div class="tab-pane fade" id="text" role="tabpanel" aria-labelledby="text-button">
+          <label>Text: </label>
+          <br>
+          <div class="form-inline d-flex justify-content-around">
+            <label for="text-color">Color: </label>
+            <select class="form-control" id="text-color">
+              <option value="black">Black</option>
+              <option value="red">Red</option>
+              <option value="orange">Orange</option>
+              <option value="yellow">Yellow</option>
+              <option value="green">Green</option>
+              <option value="blue">Blue</option>
+              <option value="brown">Brown</option>
+              <option value="purple">Purple</option>
+              <option value="white">White</option>
+            </select>
+            <div id="chosen-color">
+            </div>
+          </div>
+          <br>
+          <div class="form-inline d-flex justify-content-around">
+            <label for="text-style">Style: </label>
+            <select class="form-control" id="text-style">
+              <option value="Times">Times</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Arial">Arial</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Courier">Courier</option>
+              <option value="Monaco">Monaco</option>
+            </select>
+          </div>
+          <br>
+          <div class="form-inline d-flex justify-content-center">
+            <label for="text-size">Size(px): &nbsp; </label>
+            <input id="text-size" type="number" step="1" min="1" max="50" value="12">
+          </div>
+          <br>
+          <div id="button-wrapper">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="addText">Add Text</button>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="background" role="tabpanel" aria-labelledby="background-button">
+          <label>Background-Color: </label>
+          <br>
+          <div class="form-inline d-flex justify-content-around">
+            <label for="background-color">Color: </label>
+            <select class="form-control" id="background-color">
+              <option value="black">Black</option>
+              <option value="red">Red</option>
+              <option value="orange">Orange</option>
+              <option value="yellow">Yellow</option>
+              <option value="green">Green</option>
+              <option value="blue">Blue</option>
+              <option value="brown">Brown</option>
+              <option value="purple">Purple</option>
+              <option value="white">White</option>
+            </select>
+            <div id="picked-color">
+            </div>
+          </div>
+          <br>
+        </div>
       </div>
 
       <div id="canvas-holder">

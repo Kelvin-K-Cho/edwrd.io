@@ -61,9 +61,15 @@ $(function(){
   };
 
   let addText = () => {
-    let text = new fabric.IText("text", {
+    let style = $(`#text-style`).val();
+    let size = parseInt($(`#text-size`).val());
+    let color = $(`#text-color`).val();
+    let text = new fabric.IText("Happy birthday", {
       left: 50,
-      top: 50
+      top: 50,
+      fontFamily: style,
+      fontSize: size,
+      fill: color
     });
     canvas.add(text);
   };
@@ -126,28 +132,11 @@ $(function(){
       canvas.add(img);
     });
 
-    // let image = new Image();
-    //
-    // image.onload = function () {
-    //   let tempCanvas = document.createElement('canvas');
-    //   tempCanvas.width = this.width;
-    //   tempCanvas.height = this.height;
-    //   tempCanvas.getContext(`2d`).drawImage(this, 0, 0);
-    //
-    //   let dataURL = canvas.toDataURL();
-    //
-    //   let fabricImage = new fabric.Image(dataURL);
-    //
-    //   tempCanvas = null;
-    // };
-    //
-    // image.src = imageUrl;
-
     return false;
   };
 
-  let changeBackground = () => {
-    canvas.setBackgroundColor("#42bcf4", //this is correct
+  let changeBackground = (color) => {
+    canvas.setBackgroundColor(color, //this is correct
     canvas.renderAll.bind(canvas));
   };
 
@@ -293,6 +282,17 @@ $(function(){
     $(`#selected-color`).css(`background-color`, `${color}`);
   };
 
+  let alterColor = () => {
+    let color = $(`#text-color`).val();
+    $(`#chosen-color`).css(`background-color`, `${color}`);
+  };
+
+  let modifyColor = () => {
+    let color = $(`#background-color`).val();
+    $(`#picked-color`).css(`background-color`, `${color}`);
+    changeBackground(color);
+  };
+
   // Events
   initializeCanvas();
   fetchTemplates(); //load all templates from the start since it's big call
@@ -318,6 +318,8 @@ $(function(){
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);
   $(`#shape-color`).change(changeColor);
+  $(`#text-color`).change(alterColor);
+  $(`#background-color`).change(modifyColor);
 
   $("#addButton").click(function(){
     $("#addPhoto").click();
