@@ -23,7 +23,7 @@ $(function(){
   let addShape = () => {
     let shape = selectedShape;
     let color = $(`#shape-color`).val();
-    let opacity = parseInt($(`#shape-opacity`).val());
+    let opacity = parseFloat($(`#shape-opacity`).val());
     switch (shape) {
       case "circle":
         let circle = new fabric.Circle({
@@ -31,7 +31,7 @@ $(function(){
           top: 50,
           radius: 20,
           fill: color,
-          opacity: opacity
+          opacity
         });
         canvas.add(circle);
         break;
@@ -47,7 +47,7 @@ $(function(){
         canvas.add(square);
         break;
       case "line":
-        let line = new fabric.Line([50, 100, 200, 200], {
+        let line = new fabric.Line([50, 50, 150, 50], {
           left: 50,
           top: 50,
           stroke: color,
@@ -68,7 +68,7 @@ $(function(){
     canvas.add(text);
   };
 
-  let deleteImage = () => {
+  let deleteItem = () => {
     let activeObject = canvas.getActiveObject();
     canvas.remove(activeObject);
   };
@@ -200,7 +200,7 @@ $(function(){
   $(`#shapes-list`).selectable({
     selected: function(){
       $(`.ui-selected`, this).each(function(){
-        selectedShape = $(this).get(0).id;
+        selectedShape = $(this).get(0).id || selectedShape;
       });
     }
   });
@@ -208,7 +208,7 @@ $(function(){
   $("#addText").click(addText);
   $("#addRectangle").click(addRectangle);
   $("#addShape").click(addShape);
-  $("#deleteImage").click(deleteImage);
+  $("#deleteItem").click(deleteItem);
   $("#downloadTemplate").click(downloadTemplate);
   $("#changeBackground").click(changeBackground);
   $("#layouts-list").on("click", ".layout-image", setTemplate);
