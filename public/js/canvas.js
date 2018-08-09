@@ -13,6 +13,10 @@ $(function(){
     let shape = selectedShape;
     let color = $(`#shape-color`).val();
     let opacity = parseFloat($(`#shape-opacity`).val());
+    if (!shape) {
+      alert(`Please select a shape`);
+      return false;
+    }
     switch (shape) {
       case "circle":
         let circle = new fabric.Circle({
@@ -140,28 +144,6 @@ $(function(){
         a.click();
     };
 
-    // let preview = canvas.toDataURL({
-    //   multiplier: .3
-    // });
-    //
-    // let js = JSON.parse(json);
-    //
-    // for (let i = 0; i < js.objects.length; i++) {
-    //   if (js.objects[i].type === "image") {
-    //     js.objects[i].src = "";
-    //   }
-    // }
-    //
-    // let object = {};
-    // object["_id"] = 1;
-    // object["templatePreviewURL"] = preview;
-    // object["occasion"] = "birthday";
-    // object["template"] = js;
-    //
-    // let string = JSON.stringify(object);
-    //
-    // download(string, 'json.txt', "text/plain;charset=utf-8");
-
     download(json, 'json.txt', "text/plain;charset=utf-8");
   };
 
@@ -239,74 +221,6 @@ $(function(){
     });
   };
 
-  let fetchImages = () => {
-    let html = ``;
-    let url = `http://34.216.224.153:9000/n3n/cloud/app/service/tempPhotoFetch`;
-    $.get(url, function(output){
-      $(`#images-list`).empty();
-      let parsedList = JSON.parse(output);
-      parsedList.forEach((element) => {
-        let previewURL = element["photoPreviewURL"];
-
-        html += `
-          <li class="images-item">
-            <img class="preview-image" src="${previewURL}">
-          </li>
-        `;
-
-        $(`#images-list`).append(html);
-
-        html = ``;
-      });
-    });
-  };
-
-  let fetchTemplates = () => {
-    let html = ``;
-    let url = `http://34.216.224.153:9000/fabric/fetchAllTemplates`;
-
-    let scale = (image, factor) => {
-      image.setHeight(image.getHeight() * factor);
-      image.setWidth(image.getWidth() * factor);
-      if (image.backgroundImage) {
-        let backgroundImage = image.backgroundImage;
-        backgroundImage.width = backgroundImage.width * factor;
-        backgroundImage.height = backgroundImage.height * factor;
-      }
-      image.setZoom(factor);
-      image.renderAll();
-      image.calcOffset();
-    };
-
-    let templates = window._templates = {};
-
-    $.get(url, function(output){
-      $(`#layouts-list`).empty();
-      let parsedList = JSON.parse(output);
-
-      Object.values(parsedList).forEach((element) => {
-        let object = JSON.parse(element);
-        let _id = object[`_id`];
-
-        templates[`template-${_id}`] = object;
-
-        html += `
-          <li class="layouts-item">
-            <canvas class="layout-image" id="template-${_id}" height="480" width="320"></canvas>
-          </li>
-        `;
-        $(`#layouts-list`).append(html);
-
-        let image = new fabric.StaticCanvas(`template-${_id}`);
-        image.loadFromJSON(object);
-
-        scale(image, .3);
-        html = ``;
-
-      });
-    });
-  };
-
   let setTemplate = (event) => {
     event.preventDefault();
 
@@ -370,22 +284,6 @@ $(function(){
     return false;
   };
 
-  let setLayout = (event) => {
-    event.preventDefault();
-
-    let templateId = event.currentTarget.id;
-
-    let template = window._templates[templateId];
-
-    canvas.clear();
-
-    canvas.loadFromJSON(template, function() {
-      canvas.renderAll();
-    });
-
-    return false;
-  };
-
   let uploadTemplate = (e) => {
     let file = e.target.files[0];
     let json;
@@ -403,26 +301,17 @@ $(function(){
     reader.readAsText(file);
   };
 
-  let changeColor = () => {
-    let color = $(`#shape-color`).val();
-    $(`#selected-color`).css(`background-color`, `${color}`);
-  };
-
-  let alterColor = () => {
-    let color = $(`#text-color`).val();
-    $(`#chosen-color`).css(`background-color`, `${color}`);
-  };
-
-  let modifyColor = () => {
-    let color = $(`#background-color`).val();
-    $(`#picked-color`).css(`background-color`, `${color}`);
-    changeBackground(color);
+  let changeColor = (event) => {
+    let eventId = event.currentTarget.id;
+    let color = $(`#${eventId}`).val();
+    $(`#${eventId}`).next(`.selected-color`).css(`background-color`, `${color}`);
+    if (eventId === `background-color`) {
+      changeBackground(color);
+    }
   };
 
   // Events
   initializeCanvas();
-  fetchTemplates(); //load all templates from the start since it's big call
-  // fetchImages();
 
   $(`#shapes-list`).selectable({
     selected: function(){
@@ -436,18 +325,17 @@ $(function(){
   $("#addShape").click(addShape);
   $("#deleteItem").click(deleteItem);
   $("#downloadTemplate").click(downloadTemplate);
+  $("#saveTemplate").click(saveTemplate);
   $(`#searchButton`).click(searchTemplates);
   $("#changeBackground").click(changeBackground);
-  $("#layouts-list").on("click", ".layout-image", setLayout);
   $("#templates-list").on("click", ".template-image", setTemplate);
   $("#images-list").on("click", ".preview-image", changeImage);
-  $("#saveTemplate").click(saveTemplate);
 
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);
   $(`#shape-color`).change(changeColor);
-  $(`#text-color`).change(alterColor);
-  $(`#background-color`).change(modifyColor);
+  $(`#text-color`).change(changeColor);
+  $(`#background-color`).change(changeColor);
 
   $("#addButton").click(function(){
     $("#addPhoto").click();

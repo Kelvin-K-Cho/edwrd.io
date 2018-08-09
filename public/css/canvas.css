@@ -120,7 +120,7 @@ canvas {
   width: 3.25vw;
 }
 
-#selected-color, #chosen-color, #picked-color {
+.selected-color {
   height: 30px;
   width: 30px;
   background-color: black;
