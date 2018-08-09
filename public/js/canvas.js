@@ -9,17 +9,6 @@ $(function(){
     canvas.backgroundColor = "#fff";
   };
 
-  let addRectangle = () => {
-    let rectangle = new fabric.Rect({
-      left: 50,
-      top: 50,
-      width: 20,
-      height: 20,
-      opacity: .25,
-    });
-    canvas.add(rectangle);
-  };
-
   let addShape = () => {
     let shape = selectedShape;
     let color = $(`#shape-color`).val();
@@ -176,6 +165,80 @@ $(function(){
     download(json, 'json.txt', "text/plain;charset=utf-8");
   };
 
+  let saveTemplate = () => {
+    let _id = $(`#templateName`).val();
+    let occasion = $(`#occasion`).val();
+
+    if (!_id || !occasion) {
+      return false;
+    }
+
+    let previewURL = canvas.toDataURL({
+      multiplier: .3
+    });
+
+    let json = canvas.toJSON();
+    let objects = json[`objects`];
+
+    objects.forEach((object) => {
+      if (object[`type`] === `image`) {
+        object[`src`] = ``;
+      }
+    });
+
+    let input = {
+      "_id": _id,
+      "occasion": occasion,
+      "templatePreviewURL": previewURL,
+      "template": json
+    };
+
+    let url = `http://34.216.224.153:9000/fabric/template/save`;
+
+    $.post(url, JSON.stringify(input), function(output){
+      $(".close").trigger("click");
+    });
+
+    return false;
+  };
+
+  let searchTemplates = () => {
+    let phrase = $(`#search-phrase`).val();
+    let url = `http://34.216.224.153:9000/n3n/cloud/syntax3`;
+    let html = ``;
+    $.post(url, phrase, function(output){
+      let json = JSON.parse(output);
+      $(`#images-list`).empty();
+      let images = json.images;
+      images.forEach((element) => {
+        let previewURL = element["photoPreviewURL"];
+        html = `
+          <li class="images-item">
+            <img class="preview-image" src="${previewURL}">
+          </li>
+        `;
+        $(`#images-list`).append(html);
+        html = ``;
+      });
+      $(`#templates-list`).empty();
+      let templates = json.templates;
+      templates.forEach((element) => {
+        let previewURL = element["templatePreviewURL"];
+        let id = element["_id"];
+
+        html += `
+          <li class="templates-item">
+            <img class="template-image" id="${id}" src="${previewURL}">
+          </li>
+        `;
+
+        $(`#templates-list`).append(html);
+
+        html = ``;
+      });
+    });
+  };
+
   let fetchImages = () => {
     let html = ``;
     let url = `http://34.216.224.153:9000/n3n/cloud/app/service/tempPhotoFetch`;
@@ -248,6 +311,69 @@ $(function(){
     event.preventDefault();
 
     let templateId = event.currentTarget.id;
+    let url = `http://34.216.224.153:9000/fabric/template/fetch`;
+
+    $.post(url, templateId, function(output){
+      let template = output;
+      canvas.clear();
+      canvas.loadFromJSON(template, function() {
+        canvas.renderAll();
+      });
+      let imagesList = [];
+
+      $(`.preview-image`).each((index, li) => {
+        let parseUrl = (unparsedUrl) => {
+          let regex = /http:/gi;
+          let result;
+          let indicies = [];
+          while ( (result = regex.exec(unparsedUrl)) ) {
+            indicies.push(result.index);
+          }
+          let last = indicies[indicies.length - 1];
+          return unparsedUrl.slice(last);
+        };
+
+        let imageUrl = parseUrl(li.src);
+
+        imagesList.push(imageUrl);
+      });
+
+      let objects = canvas._objects;
+
+      let counter = 0;
+
+      objects.forEach((object) => {
+        if (object["type"] === "image") {
+          let left = object.left;
+          let top = object.top;
+          let tl = object.aCoords.tl;
+          let br = object.aCoords.br;
+          let width = br.x - tl.x;
+          let height = br.y - tl.y;
+          let imageUrl = imagesList[counter];
+
+          fabric.Image.fromURL(imageUrl, function(img){
+            img.set({
+              left,
+              top
+            }).scale(0.1);
+            img.scaleToWidth(width);
+            img.scaleToHeight(height);
+            canvas.remove(object);
+            canvas.add(img);
+          });
+        }
+      });
+
+    });
+
+    return false;
+  };
+
+  let setLayout = (event) => {
+    event.preventDefault();
+
+    let templateId = event.currentTarget.id;
 
     let template = window._templates[templateId];
 
@@ -296,7 +422,7 @@ $(function(){
   // Events
   initializeCanvas();
   fetchTemplates(); //load all templates from the start since it's big call
-  fetchImages();
+  // fetchImages();
 
   $(`#shapes-list`).selectable({
     selected: function(){
@@ -307,13 +433,15 @@ $(function(){
   });
 
   $("#addText").click(addText);
-  $("#addRectangle").click(addRectangle);
   $("#addShape").click(addShape);
   $("#deleteItem").click(deleteItem);
   $("#downloadTemplate").click(downloadTemplate);
+  $(`#searchButton`).click(searchTemplates);
   $("#changeBackground").click(changeBackground);
-  $("#layouts-list").on("click", ".layout-image", setTemplate);
+  $("#layouts-list").on("click", ".layout-image", setLayout);
+  $("#templates-list").on("click", ".template-image", setTemplate);
   $("#images-list").on("click", ".preview-image", changeImage);
+  $("#saveTemplate").click(saveTemplate);
 
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);

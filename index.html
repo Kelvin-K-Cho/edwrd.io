@@ -100,14 +100,25 @@
           </li>
         </ul>
         <div class="right-nav">
-          <button type="button" class="btn btn-outline-secondary btn-sm" id="downloadTemplate">Download Template</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" id="uploadButton">Upload Template</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="openSave" data-toggle="modal" data-target="#saveModal">Save</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="downloadTemplate">Download</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="uploadButton">Upload</button>
           <input type="file" name="file" id="uploadTemplate" />
         </div>
       </nav>
 
       <div class="tab-content" id="side-content">
-        <div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-button">search</div>
+        <div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-button">
+          <label>Search: </label>
+          <form class="search-form">
+            <input id="search-phrase" class="form-control" type="search" placeholder="So, what's on your mind?" aria-label="Search">
+            <div>
+              <button id="searchButton" class="btn btn-outline-success" type="submit">Search</button>
+            </div>
+          </form>
+          <ul id="templates-list">
+          </ul>
+        </div>
         <div class="tab-pane fade" id="layouts" role="tabpanel" aria-labelledby="layouts-button">
           <label>Layouts: </label>
           <ul id="layouts-list">
@@ -205,7 +216,7 @@
           <div class="form-inline d-flex justify-content-around">
             <label for="background-color">Color: </label>
             <select class="form-control" id="background-color">
-              <option value="black">Black</option>
+              <option value="white">White</option>
               <option value="red">Red</option>
               <option value="orange">Orange</option>
               <option value="yellow">Yellow</option>
@@ -213,12 +224,45 @@
               <option value="blue">Blue</option>
               <option value="brown">Brown</option>
               <option value="purple">Purple</option>
-              <option value="white">White</option>
+              <option value="black">Black</option>
             </select>
             <div id="picked-color">
             </div>
           </div>
           <br>
+        </div>
+      </div>
+
+      <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="saveModalLabel">Save Options</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="modal-form">
+                <div class="form-inline">
+                  <label for="templateName">Template Name: &nbsp;</label>
+                  <div>
+                    <input type="text" id="templateName" placeholder=" birthdayTemplate01">
+                  </div>
+                </div>
+                <div class="form-inline">
+                  <label for="occasion">Occasion: &nbsp;</label>
+                  <div>
+                    <input type="text" id="occasion" placeholder=" birthday">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="saveTemplate">Save Template</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -239,9 +283,6 @@
           </div>
 
           <div class="right-nav" id="footer-right-nav">
-            <button type="button" class="btn btn-outline-secondary btn-xs" id="changeBackground">Change Background</button>
-            <button type="button" class="btn btn-outline-secondary btn-xs" id="addText">Add Text</button>
-            <button type="button" class="btn btn-outline-secondary btn-xs" id="addRectangle">Add Rectangle</button>
             <button type="button" class="btn btn-outline-secondary btn-xs" id="addButton">Add Photo</button>
             <input type="file" name="file" id="addPhoto" />
           </div>
