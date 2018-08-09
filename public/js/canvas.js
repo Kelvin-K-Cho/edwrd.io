@@ -90,6 +90,62 @@ $(function(){
     reader.readAsDataURL(e.target.files[0]);
   };
 
+  let changeImage = (event) => {
+    event.preventDefault();
+
+    let parseUrl = (url) => {
+      let regex = /http:/gi;
+      let result;
+      let indicies = [];
+      while ( (result = regex.exec(url)) ) {
+        indicies.push(result.index);
+      }
+      let last = indicies[indicies.length - 1];
+      return url.slice(last);
+    };
+
+    let imageUrl = parseUrl(event.currentTarget.src);
+
+    let activeObject = canvas.getActiveObject();
+
+    let left = activeObject.left;
+    let top = activeObject.top;
+    let tl = activeObject.aCoords.tl;
+    let br = activeObject.aCoords.br;
+    let width = br.x - tl.x;
+    let height = br.y - tl.y;
+
+    fabric.Image.fromURL(imageUrl, function(img){
+      img.set({
+        left,
+        top,
+      }).scale(0.1);
+      img.scaleToWidth(width);
+      img.scaleToHeight(height);
+      canvas.remove(activeObject);
+      canvas.add(img);
+    });
+
+    // let image = new Image();
+    //
+    // image.onload = function () {
+    //   let tempCanvas = document.createElement('canvas');
+    //   tempCanvas.width = this.width;
+    //   tempCanvas.height = this.height;
+    //   tempCanvas.getContext(`2d`).drawImage(this, 0, 0);
+    //
+    //   let dataURL = canvas.toDataURL();
+    //
+    //   let fabricImage = new fabric.Image(dataURL);
+    //
+    //   tempCanvas = null;
+    // };
+    //
+    // image.src = imageUrl;
+
+    return false;
+  };
+
   let changeBackground = () => {
     canvas.setBackgroundColor("#42bcf4", //this is correct
     canvas.renderAll.bind(canvas));
@@ -106,7 +162,51 @@ $(function(){
         a.click();
     };
 
+    // let preview = canvas.toDataURL({
+    //   multiplier: .3
+    // });
+    //
+    // let js = JSON.parse(json);
+    //
+    // for (let i = 0; i < js.objects.length; i++) {
+    //   if (js.objects[i].type === "image") {
+    //     js.objects[i].src = "";
+    //   }
+    // }
+    //
+    // let object = {};
+    // object["_id"] = 1;
+    // object["templatePreviewURL"] = preview;
+    // object["occasion"] = "birthday";
+    // object["template"] = js;
+    //
+    // let string = JSON.stringify(object);
+    //
+    // download(string, 'json.txt', "text/plain;charset=utf-8");
+
     download(json, 'json.txt', "text/plain;charset=utf-8");
+  };
+
+  let fetchImages = () => {
+    let html = ``;
+    let url = `http://34.216.224.153:9000/n3n/cloud/app/service/tempPhotoFetch`;
+    $.get(url, function(output){
+      $(`#images-list`).empty();
+      let parsedList = JSON.parse(output);
+      parsedList.forEach((element) => {
+        let previewURL = element["photoPreviewURL"];
+
+        html += `
+          <li class="images-item">
+            <img class="preview-image" src="${previewURL}">
+          </li>
+        `;
+
+        $(`#images-list`).append(html);
+
+        html = ``;
+      });
+    });
   };
 
   let fetchTemplates = () => {
@@ -196,6 +296,7 @@ $(function(){
   // Events
   initializeCanvas();
   fetchTemplates(); //load all templates from the start since it's big call
+  fetchImages();
 
   $(`#shapes-list`).selectable({
     selected: function(){
@@ -212,6 +313,7 @@ $(function(){
   $("#downloadTemplate").click(downloadTemplate);
   $("#changeBackground").click(changeBackground);
   $("#layouts-list").on("click", ".layout-image", setTemplate);
+  $("#images-list").on("click", ".preview-image", changeImage);
 
   $("#addPhoto").change(addPhoto);
   $("#uploadTemplate").change(uploadTemplate);
