@@ -105,6 +105,29 @@ $(function(){
 
     let imageUrl = parseUrl(event.currentTarget.src);
 
+    let convertBase64 = (url, callback) => {
+      let img = new Image();
+      img.crossOrigin = `Anonymous`;
+
+      img.onload = function () {
+        let tempCanvas = document.createElement(`canvas`);
+        let context = tempCanvas.getContext(`2d`);
+        let dataURL;
+        tempCanvas.height = this.height;
+        tempCanvas.width = this.width;
+        context.drawImage(this, 0, 0);
+        dataURL = tempCanvas.toDataURL();
+        callback(dataURL);
+        canvas = null;
+      };
+
+      img.src = url;
+    };
+
+    // convertBase64(imageUrl, function(base64){
+    //   console.log(base64);
+    // });
+
     let activeObject = canvas.getActiveObject();
 
     let left = activeObject.left;
@@ -221,6 +244,13 @@ $(function(){
     });
   };
 
+  let renderCanvas = (template) => {
+    canvas.clear();
+    canvas.loadFromJSON(template, function() {
+      canvas.renderAll();
+    });
+  };
+
   let setTemplate = (event) => {
     event.preventDefault();
 
@@ -229,10 +259,12 @@ $(function(){
 
     $.post(url, templateId, function(output){
       let template = output;
-      canvas.clear();
-      canvas.loadFromJSON(template, function() {
-        canvas.renderAll();
-      });
+      let templateJSON = JSON.parse(template);
+
+      // console.log(templateJSON.objects);
+
+      let counter = 0;
+
       let imagesList = [];
 
       $(`.preview-image`).each((index, li) => {
@@ -252,12 +284,37 @@ $(function(){
         imagesList.push(imageUrl);
       });
 
-      let objects = canvas._objects;
 
-      let counter = 0;
+      let convertBase64 = (imgUrl, callback) => {
+        let img = new Image();
+        img.crossOrigin = `Anonymous`;
+
+        img.onload = function () {
+          let tempCanvas = document.createElement(`canvas`);
+          let context = tempCanvas.getContext(`2d`);
+          let dataURL;
+          tempCanvas.height = this.height;
+          tempCanvas.width = this.width;
+          context.drawImage(this, 0, 0);
+          dataURL = tempCanvas.toDataURL();
+          callback(dataURL);
+          canvas = null;
+        };
+
+        img.src = imgUrl;
+      };
+
+      let objects = canvas._objects;
 
       objects.forEach((object) => {
         if (object["type"] === "image") {
+
+          // let imageUrl = imagesList[counter];
+          // counter++;
+          // convertBase64(imageUrl, function(base64){
+          //   console.log(base64);
+          // });
+
           let left = object.left;
           let top = object.top;
           let tl = object.aCoords.tl;
@@ -276,7 +333,13 @@ $(function(){
             canvas.remove(object);
             canvas.add(img);
           });
+
         }
+      });
+
+      canvas.clear();
+      canvas.loadFromJSON(template, function() {
+        canvas.renderAll();
       });
 
     });
