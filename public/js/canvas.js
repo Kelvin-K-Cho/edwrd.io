@@ -107,6 +107,11 @@ $(function(){
 
     let activeObject = canvas.getActiveObject();
 
+    if (!activeObject) {
+      alert("Please select an image you want to replace.");
+      return false;
+    }
+
     let left = activeObject.left;
     let top = activeObject.top;
     let tl = activeObject.aCoords.tl;
