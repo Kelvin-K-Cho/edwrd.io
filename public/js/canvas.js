@@ -111,18 +111,19 @@ $(function(){
     let top = activeObject.top;
     let tl = activeObject.aCoords.tl;
     let br = activeObject.aCoords.br;
-    let width = br.x - tl.x;
-    let height = br.y - tl.y;
+    let width = Math.round(br.x - tl.x);
+    let height = Math.round(br.y - tl.y);
 
     fabric.Image.fromURL(imageUrl, function(img){
       img.set({
-        left,
-        top,
-      }).scale(0.1);
-      img.scaleToWidth(width);
-      img.scaleToHeight(height);
+        scaleX: width / img.width,
+        scaleY: height / img.height,
+        left: left,
+        top: top,
+      });
       canvas.remove(activeObject);
       canvas.add(img);
+      canvas.renderAll();
     });
 
     return false;
@@ -263,8 +264,8 @@ $(function(){
 
           let imageUrl = imagesList[counter];
 
-          let left = object.left - 1.5;
-          let top = object.top - 1.5;
+          let left = object.left - 1.75;
+          let top = object.top - 1.75;
           let tl = object.aCoords.tl;
           let br = object.aCoords.br;
           let width = Math.round(br.x - tl.x);
